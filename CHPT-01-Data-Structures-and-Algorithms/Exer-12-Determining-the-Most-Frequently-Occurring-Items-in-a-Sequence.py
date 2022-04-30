@@ -2,9 +2,6 @@
 
 from collections import Counter
 
-"""
-
-
 word_counts = Counter(words)
 
 top_three = word_counts.most_common(3)
@@ -22,7 +19,6 @@ for word in morewords:
 print(word_counts['eyes'])
 
 word_counts.update(morewords)
-"""
 
 words = [
 'look', 'into', 'my', 'eyes', 'look', 'into', 'my', 'eyes',
