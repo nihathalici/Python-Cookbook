@@ -4,11 +4,6 @@ This is my repo following the book "Python Cookbook" by David Beazley and Brian 
 Synopsis taken from the book:
 "Packed with practical recipes written and tested with Python 3.3, this unique cookbook is for experienced Python programmers who want to focus on modern tools and idioms."
 
-GitHub
-========================================================
-
-This repo contains the code in the 3rd Edition Python Cookbook by David Beazley and Brian K. Jones in Jupyter Notebooks:
-https://github.com/acheamponge/Python-Cookbook-3rd-edition-JupyterNotebook-Code
 
 Links and Appendix
 ========================================================
