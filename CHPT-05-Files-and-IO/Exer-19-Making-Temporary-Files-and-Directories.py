@@ -1,5 +1,5 @@
 # Exer-19-Making-Temporary-Files-and-Directories
-"""
+
 from tempfile import TemporaryFile
 
 with TemporaryFile('w+t') as f:
@@ -38,7 +38,7 @@ with TemporaryDirectory() as dirname:
     print('dirname is:', dirname)
 
 ###
-"""
+
 import tempfile
 
 print(tempfile.mkstemp())
