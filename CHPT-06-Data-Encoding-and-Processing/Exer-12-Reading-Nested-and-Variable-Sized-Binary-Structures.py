@@ -177,3 +177,61 @@ class StructureMeta(type):
                 setattr(self, fieldname, StructField(format, offset))
                 offset += struct.calcsize(format)
         setattr(self, 'struct_size', offset)
+        
+class Point(Structure):
+    _fields_ = [
+        ('<d', 'x'),
+        ('d', 'y')
+    ]
+
+class PolyHeader(Structure):
+    _fields_ = [
+        ('<d', 'file_code'),
+        (Point, 'min'),  # nested struct
+        (Point, 'max'),  # nested struct
+        ('i', 'num_polys')
+    ]
+
+f = open('polys.bin', 'rb')
+phead = PolyHeader.from_file(f)
+phead.file_code == 0x1234
+phead.min  # Nested structure
+phead.min.x
+phead.min.y
+phead.max.x
+phead.max.y
+phead.num_polys
+
+###
+
+class SizedRecord:
+    def __init__(self, bytedata):
+        self._buffer = memoryview(bytedata)
+
+    @classmethod
+    def from_file(cls, f, size_fmt, includes_size=True):
+        sz_nbytes = struct.calcsize(size_fmt)
+        sz_bytes = f.read(sz_nbytes)
+        sz, = struct.unpack(size_fmt, sz_bytes)
+        buf = f.read(sz - includes_size * sz_nbytes)
+        return cls(buf)
+    
+    def iter_as(self, code):
+        if isinstance(code, str):
+            s = struct.Struct(code)
+            for off in range(0, len(self._buffer), s.size):
+                yield s.unpack_from(self._buffer, off)
+        elif isinstance(code, StructureMeta):
+            size = code.struct_size
+            for off in range(0, len(self._buffer), size):
+                data = self._buffer[off:off+size]
+                yield code(data)
+    
+f = open('polys.bin', 'rb')
+phead = PolyHeader.from_file(f)
+phead.num_polys
+polydata = [ SizedRecord.from_file(f, '<i')
+             for n in range(phead.num_polys)]
+polydata
+
+
