@@ -234,4 +234,57 @@ polydata = [ SizedRecord.from_file(f, '<i')
              for n in range(phead.num_polys)]
 polydata
 
+###
+
+for n, poly in enumerate(polydata):
+    print('Polygon', n)
+    for p in poly.iter_as('<dd'):
+        print(p)
+
+for n, poly in enumerate(polydata):
+    print('Polygon', n)
+    for p in poly.iter_as(Point):
+        print(p.x, p.y)
+
+class Point(Structure):
+    _fields_ = [
+        ('<d', 'x'),
+        ('d', 'y')
+    ]
+
+class PolyHeader(Structure):
+    _fields_ = [
+        ('<i', 'file_code'),
+        (Point, 'min'),
+        (Point, 'max'),
+        ('i', 'num_polys')
+    ]
+
+def read_polys(filename):
+    polys = []
+    with open(filename, 'rb') as f:
+        phead = PolyHeader.from_file(f)
+        for n in range(phead.num_polys):
+            rec = SizedRecord.from_file(f, '<i')
+            poly = [ (p.x, p.y)
+                      for p in rec.iter_as(Point)]
+            polys.append(poly)
+    return polys
+
+###
+
+class ShapeFile(Structure):
+    _fields_ = [ ('>i', 'file_code'),  # Big endian
+                 ('20s', 'unused'),
+                 ('i', 'file_length'),
+                 ('<i', 'version')   # Little endian
+                 ('i', 'shape_type'),
+                 ('d', 'min_x'),
+                 ('d', 'min_y'),
+                 ('d', 'max_x'),
+                 ('d', 'max_y'),
+                 ('d', 'min_z'),
+                 ('d', 'max_z'),
+                 ('d', 'min_m'),
+                 ('d', 'max_m') ]
 
