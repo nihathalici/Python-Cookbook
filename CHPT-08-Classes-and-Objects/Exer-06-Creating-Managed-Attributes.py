@@ -1,5 +1,5 @@
 # Exer-06-Creating-Managed-Attributes
-"""
+
 class Person:
     def __init__(self, first_name):
         self.first_name = first_name
@@ -67,7 +67,7 @@ class Person:
         self._first_name = value
 
 ###
-"""
+
 import math
 
 class Circle:
