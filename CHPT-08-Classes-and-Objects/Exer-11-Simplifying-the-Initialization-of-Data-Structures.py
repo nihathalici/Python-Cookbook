@@ -1,5 +1,5 @@
 # Exer-11-Simplifying-the-Initialization-of-Data-Structures
-"""
+
 class Structure:
     _fields = []
     def __init__(self, *args):
@@ -55,7 +55,7 @@ if __name__ == '__main__':
     s3 = Stock('ACME', shares=50, price=91.1)
     
 ###
-"""
+
 class Structure:
     # Class variable that specifies expected fields
     _fields = []
@@ -82,3 +82,51 @@ if __name__ == '__main__':
 
     s1 = Stock('ACME', 50, 91.1)
     s2 = Stock('ACME', 50, 91.1, date='8/2/2012')
+
+
+###
+
+class Stock:
+    def __init__(self, name, shares, price):
+        self.name = name
+        self.shares = shares
+        self.price = price
+
+class Point:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+class Circle:
+    def __init__(self, radius):
+        self.radius = radius
+    def area(self):
+        return math.pi * self.radius ** 2
+
+###
+
+class Structure:
+    # Class variable that specifies expected fields
+    _fields = []
+    def __init__(self, *args):
+        if len(args) != len(self._fields):
+            raise TypeError('Expected {} arguments'.format(len(self._fields)))
+
+        # Set the arguments (alternate)
+        self.__dict__.update(zip(self._fields, args))
+
+###
+help(Stock)
+
+###
+
+def init_fromlocals(self):
+    import sys
+    locs = sys._getframe(1).f_locals
+    for k, v in locs.items():
+        if k != 'self':
+            setattr(self, k, v)
+
+class Stock:
+    def __init__(self, name, shares, price):
+        init_fromlocals(self)
