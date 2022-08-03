@@ -46,8 +46,58 @@ class UnsignedInteger(Integer, Unsigned):
     pass
 
 class Float(Typed):
-    expected_type = float 
+    expected_type = float
 
-            
-        
-        
+class UnsignedFloat(Float, Unsigned):
+    pass
+
+class String(Typed):
+    expected_type = str
+
+class SizedString(String, MaxSized):
+    pass
+
+###
+
+class Stock:
+    # Specify constraints
+    name = SizedString('name', size=8)
+    shares = UnsignedInteger('shares')
+    price = UnsignedFloat('price')
+    def __init__(self, name, shares, price):
+        self.name = name
+        self.shares = shares
+        self.price = price
+
+s = Stock('ACME', 50, 91.1)
+print(s.name)
+s.shares = 75
+# s.shares = -10 ValueError('Expected >= 0')
+# s.price = 'a lot' # TypeError: expected <class 'float'>
+# s.name = 'ABRACADABRA' # ValueError: size must be < 8
+
+###
+
+# Class decorator to apply constraints
+def check_attributes(**kwargs):
+    def decorate(cls):
+        for key, value in kwargs.items():
+            if isinstance(value, Descriptor):
+                value.name = key
+                setattr(cls, key, value)
+            else:
+                setattr(cls, key, value(key))
+        return cls
+    return decorate
+
+# Example
+@check_attributes(name=SizedString(size=8),
+                  shares=UnsignedInteger,
+                  price=UnsignedFloat)
+
+class Stock:
+    def __init__(self, name, shares, price):
+        self.name = name
+        self.shares = shares
+        self.price = price
+    
