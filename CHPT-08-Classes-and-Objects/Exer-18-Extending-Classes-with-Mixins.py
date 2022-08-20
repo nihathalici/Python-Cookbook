@@ -39,8 +39,35 @@ class StringKeysMappingMixin:
         return super().__setitem__(key, value)
 
 
+###
 
+class LoggedDict(LoggedMappingMixin, dict):
+    pass
 
-    
+d = LoggedDict()
+d['x'] = 23
+d['x']
+del d['x']
 
+from collections import defaultdict
 
+class SetOnceDefaultDict(SetOnceMappingMixin, defaultdict):
+    pass
+
+d = SetOnceDefaultDict(list)
+d['x'].append(2)
+d['y'].append(3)
+d['x'].append(10)
+d['x'].append(23) # KeyError: 'x already set'
+
+from collections import OrderedDict
+
+class StringOrderedDict(StringKeysMappingMixin,
+                        SetOnceMappingMixin,
+                        OrderedDict):
+    pass
+
+d = StringOrderedDict()
+d['x'] = 23
+d[42] = 10   # TypeError: keys must be strings
+d['x'] = 42  # KeyError: 'x already set'
