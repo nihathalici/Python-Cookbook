@@ -108,3 +108,34 @@ class StackCode(NodeVisitor):
 s = StackCode()
 s.generate_code(t4)
 
+###
+
+class NodeVisitor:
+    def visit(self, node):
+        nodetype = type(node).__name__
+        if nodetype == 'Number':
+            return self.visit_Number(node)
+        elif nodetype == 'Add':
+            return self.visit_Add(node)
+        elif nodetype == 'Sub':
+            return self.visit_Sub(node)
+        ...
+
+class Evaluator(NodeVisitor):
+    ...
+    def visit_Add(self, node):
+        return self.visit(node.left) + self.visit(node.right)
+
+###
+
+class HTTPHandler:
+    def handle(self, request):
+        methname = 'do_' + request.request_method
+        getattr(self, methname)(request)
+    
+    def do_GET(self, request):
+        ...
+    def do_POST(self, request):
+        ...
+    def do_HEAD(self, request):
+        ...
