@@ -95,3 +95,54 @@ if __name__ == '__main__':
     # Evaluate it
     e = Evaluator()
     print(e.visit(t4))  # Outputs 0.6
+
+###
+
+a = Number(0)
+for n in range(1, 100000):
+    a = Add(a, Number(n))
+
+e = Evaluator()
+e.visit(a) # RuntimeError: maximum recursion depth exceeded
+
+###
+
+class Evaluator(NodeVisitor):
+    def visit_Number(self, node):
+        return node.value
+    
+    def visit_Add(self, node):
+        yield (yield node.left) + (yield node.right)
+    
+    def visit_Sub(self, node):
+        yield (yield node.left) - (yield node.right)
+    
+    def visit_Mul(self, node):
+        yield (yield node.left) * (yield node.right)
+    
+    def visit_Div(self, node):
+        yield (yield node.left) / (yield node.right)
+    
+    def visit_Negate(self, node):
+        yield -(yield node.operand)
+
+a = Number(0)
+for n in range(1, 100000):
+    a = Add(a, Number(n))
+
+e = Evaluator()
+e.visit(a) # returns 4999950000
+    
+###
+
+class Evaluator(NodeVisitor):
+    def visit_Add(self, node):
+        print('Add:', node)
+        lhs = yield node.left
+        print('left=', lhs)
+        rhs = yield node.right
+        print('right=', rhs)
+        yield lhs + rhs
+
+e = Evaluator()
+e.visit(t4)
