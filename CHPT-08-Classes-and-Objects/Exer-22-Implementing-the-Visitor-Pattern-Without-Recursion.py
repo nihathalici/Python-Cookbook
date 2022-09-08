@@ -1,5 +1,6 @@
 # Exer-22-Implementing-the-Visitor-Pattern-Without-Recursion
 
+from inspect import stack
 import types
 
 class Node:
@@ -146,3 +147,22 @@ class Evaluator(NodeVisitor):
 
 e = Evaluator()
 e.visit(t4)
+
+###
+
+value = self.visit(node.left)
+value = yield node.left
+
+###
+
+try:
+    last = stack[-1]
+    if isinstance(last, types.GeneratorType):
+        stack.append(last.send(last_result))
+        last_result = None
+    elif isinstance(last, Node):
+        stack.append(self._visit(stack.pop()))
+    else:
+        last_result = stack.pop()
+except StopIteration:
+    stack.pop()
