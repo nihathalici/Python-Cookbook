@@ -32,6 +32,79 @@ print(c1.parent)
 del root
 print(c1.parent)
 
+###
 
+from multiprocessing import parent_process
+from re import A
+
+
+class Data:
+    def __del__(self):
+        print('Data.__del__')
     
+
+class Node:
+    def __init__(self):
+        self.data = Data()
+        self.parent = None
+        self.children = []
     
+    def add_child(self, child):
+        self.children.append(child)
+        child.parent = self
+
+a = Data()
+del a 
+
+a = Node()
+del a
+
+a = Node()
+a.add_child(Node())
+del a    
+
+###
+
+import gc
+
+gc.collect()
+
+###
+
+class Data:
+    def __del__(self):
+        print('Data.__del__')
+
+class Node:
+    def __init__(self):
+        self.data = Data()
+        self.parent = None
+        self.children = None
+    
+    def __del__(self):
+        del self.data
+        del self.parent
+        del self.children
+    
+    def add_child(self, child):
+        self.children.append(child)
+        child.parent = self
+
+a = Node()
+a.add_child(Node())
+del a 
+import gc 
+gc.collect
+
+###
+
+import weakref
+
+a = Node()
+a_ref = weakref.ref(a)
+
+###
+
+print(a_ref())
+del a 
+print(a_ref())
