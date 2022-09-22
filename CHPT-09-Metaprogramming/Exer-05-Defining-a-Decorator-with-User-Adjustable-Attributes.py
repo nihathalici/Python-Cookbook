@@ -51,3 +51,24 @@ print(add(2, 3))
 
 add.set_level(logging.WARNING)
 print(add(2, 3))
+
+###
+
+@timethis
+@logged
+def countdown(n):
+    while n > 0:
+        n -= 1
+
+print(countdown(10000000))
+countdown.set_level(logging.WARNING)
+countdown.set_message("Counting down to zero")
+countdown(10000000)
+
+@logged(logging.DEBUG)
+@timethis
+def countdown(n):
+    while n > 0:
+        n -= 1
+
+
