@@ -1,6 +1,5 @@
 # Exer-05-Defining-a-Decorator-with-User-Adjustable-Attributes
 
-from cmath import log
 from functools import wraps, partial
 import logging
 
