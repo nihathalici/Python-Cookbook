@@ -1,5 +1,6 @@
 # Exer-05-Defining-a-Decorator-with-User-Adjustable-Attributes
 
+from cmath import log
 from functools import wraps, partial
 import logging
 
@@ -70,5 +71,25 @@ countdown(10000000)
 def countdown(n):
     while n > 0:
         n -= 1
+
+@attach_wrapper(wrapper)
+def get_level():
+    return level 
+
+# Alternative
+wrapper.get_level = lambda: level
+...
+
+@wraps(func)
+def wrapper(*args, **kwargs):
+    wrapper.log.log(wrapper.level, wrapper.logmsg)
+    return func(*args, **kwargs)
+
+# Attach adjustable attributes
+wrapper.level = level 
+wrapper.logmsg = logmsg 
+wrapper.log = log
+...
+
 
 
