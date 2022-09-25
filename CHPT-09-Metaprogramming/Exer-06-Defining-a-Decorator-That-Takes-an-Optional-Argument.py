@@ -24,3 +24,21 @@ def add(x, y):
 @logged(level=logging.CRITICAL, name='example')
 def spam():
     print('Spam!')
+
+###
+
+# Example use
+@logged
+def add(x, y):
+    return x + y
+
+def add(x, y):
+    return x + y
+add = logged(add)
+
+@logged(level=logging.CRITICAL, name='example')
+def spam():
+    print('Spam!')
+
+spam = logged(level=logging.CRITICAL, name='example')(spam)
+
