@@ -43,4 +43,48 @@ print(spam(1, 2, 3))
 print(spam(1, "hello", 3))
 print(spam(1, 'hello', 'world'))  # TypeError
 
+###
+
+from inspect import signature
+
+def spam(x, y, z=42):
+    pass
+
+sig = signature(spam)
+print(sig)
+sig.parameters
+sig.parameters['z'].name
+sig.parameters['z'].default
+sig.parameters['z'].kind
+
+###
+
+bound_types = sig.bind_partial(int, z=int)
+bound_types
+bound_types.arguments
+
+###
+
+bound_values = sig.bind(1, 2, 3)
+bound_values.arguments
+
+for name, value in bound_values.arguments.items():
+    if name in bound_types.arguments:
+        if not isinstance(value, bound_types.arguments[name]):
+            raise TypeError()
+
+@typeassert
+def bar(x, items=None):
+    if items is None:
+        items = []
+    items.append(x)
+    return items
+
+bar(2)
+bar(2, 3) # TypeError
+bar(4, [1, 2, 3])
+
+@typeassert
+def spam(x:int, y, z:int = 42):
+    print(x, y, z)
 
