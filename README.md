@@ -5,7 +5,4 @@ Synopsis taken from the book:
 "Packed with practical recipes written and tested with Python 3.3, this unique cookbook is for experienced Python programmers who want to focus on modern tools and idioms."
 
 
-Links and Appendix
-========================================================
 
-- Get the book: https://nostarch.com/pythoncrashcourse2e
