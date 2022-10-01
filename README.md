@@ -8,5 +8,4 @@ Synopsis taken from the book:
 Links and Appendix
 ========================================================
 
-- Get the book: https://www.oreilly.com/library/view/python-cookbook-3rd/9781449357337/
-- On GitHub: https://github.com/acheamponge/Python-Cookbook-3rd-edition-JupyterNotebook-Code
+- Get the book: https://nostarch.com/pythoncrashcourse2e
