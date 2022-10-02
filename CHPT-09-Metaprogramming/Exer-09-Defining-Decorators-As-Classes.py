@@ -67,3 +67,7 @@ def profiled(func):
 @profiled
 def add(x, y):
     return x + y
+
+print(add(2, 3))
+print(add(4, 5))
+print(add.ncalls())
