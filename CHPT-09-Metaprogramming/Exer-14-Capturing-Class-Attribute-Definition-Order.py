@@ -37,3 +37,25 @@ class OrderedMeta(type):
     @classmethod
     def __prepare__(cls, clsname, bases):
         return OrderedDict()
+
+###
+
+class Structure(metaclass=OrderedMeta):
+    def as_csv(self):
+        return ','.join(str(getattr(self, name)) for name in self._order)
+
+# Example use
+class Stock(Structure):
+    name = String()
+    shares = Integer()
+    price = Float()
+    def __init__(self, name, shares, price):
+        self.name = name
+        self.shares = shares
+        self.price = price
+
+s = Stock('GOOG',100,490.1)
+print(s.name)
+print(s.as_csv())
+# t = Stock('AAPL','a lot', 610.23)  # TypeError
+
