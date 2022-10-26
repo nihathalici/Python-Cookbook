@@ -27,3 +27,6 @@ print(s[0])
 print(s.name)
 print(s.shares * s.price)
 # print(s.shares)  # AttributeError: can't set attribute
+
+s = Stock('ACME', 50, 91.1) # OK
+s = Stock(('ACME', 50, 91.1))  # Error
