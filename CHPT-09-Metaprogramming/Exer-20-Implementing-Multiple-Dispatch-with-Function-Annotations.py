@@ -98,3 +98,37 @@ class MultipleMeta(type):
     @classmethod
     def __prepare__(cls, clsname, bases):
         return MultiDict()
+        
+
+class Spam(metaclass=MultipleMeta):
+    def bar(self, x:int, y:int):
+        print('Bar 1:', x, y)
+    def bar(self, s:str, n:int=0):
+        print('Bar 2:', s, n)
+
+
+# Example: overloaded __init__
+import time
+
+class Date(metaclass=MultipleMeta):
+    def __init__(self, year: int, month: int, day: int):
+        self.year = year
+        self.month = month
+        self.day = day
+    
+    def __init__(self):
+        t = time.localtime()
+        self.__init__(t.tm_year, t.tm_mon, t.tm_mday)
+
+s = Spam()
+#print(s.bar(2, 3))
+#print(s.bar('hello'))
+#print(s.bar('hello', 5))
+#print(s.bar(2, 'hello'))  # TypeError: No matching method for types
+
+# Overloaded __init__
+d = Date(2012, 12, 21)
+e = Date()
+print(e.year)
+print(e.month)
+print(e.day)
