@@ -132,3 +132,91 @@ e = Date()
 print(e.year)
 print(e.month)
 print(e.day)
+
+###
+
+b = s.bar
+print(b)
+
+print(b.__self__)
+print(b.__func__)
+
+print(b(2, 3))
+print(b('hello'))
+
+# s.bar(x=2, y=3)  # TypeError: __call__() got an unexpected keyword argument 'y'
+# s.bar(s='hello')  # TypeError: __call__() got an unexpected keyword argument 's'
+
+###
+
+class A:
+    pass
+
+class B(A):
+    pass
+
+class C:
+    pass
+
+class Spam(metaclass=MultipleMeta):
+    def foo(self, x:A):
+        print('Foo 1:', x)
+    def foo(self, x:C):
+        print('Foo 2:', x)
+
+s = Spam()
+a = A()
+print(s.foo(a))
+
+c = C()
+print(s.foo(c))
+
+b = B()
+# s.foo(b)  TypeError: No matching method for types (<class '__main__.B'>,)
+
+###
+
+import types
+
+class multimethod:
+    def __init__(self, func):
+        self._methods = {}
+        self.__name__ = func.__name__
+        self._default = func
+    
+    def match(self, *types):
+        def register(func):
+            ndefaults = len(func.__defaults__) if func.__defaults__ else 0
+            for n in range(ndefaults+1):
+                self._methods[types[:len(types) - n]] = func
+            return self
+        return register
+    
+    def __call__(self, *args):
+        types = tuple(type(arg) for arg in args[1:])
+        meth = self._methods.get(types, None)
+        if meth:
+            return meth(*args)
+        else:
+            return self._default(*args)
+    
+    def __get__(self, instance, cls):
+        if instance is not None:
+            return types.MethodType(self, instance)
+        else:
+            return self
+
+class Spam:
+    @multimethod
+    def bar(self, *args):
+        # Default method called if no match
+        raise TypeError('No matching method for bar')
+    
+    @bar.match(int, int)
+    def bar(self, x, y):
+        print('Bar 1:', x, y)
+
+    @bar.match(str, int)
+    def bar(self, s, n = 0):
+        print('Bar 2:', s, n) 
+    
