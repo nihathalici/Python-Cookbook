@@ -67,3 +67,32 @@ def load_module(url):
     mod.__package__ = ''
     exec(code, mod.__dict__)
     return mod
+
+fib = load_module('http://localhost:15000/fib.py')
+fib.fib(10)
+
+spam = load_module('http://localhost:15000/fib.py')
+spam.hello('Guido')
+
+###
+# urlimport.py
+
+import sys
+import importlib.abc
+import imp
+from urllib.request import urlopen
+from urllib.error import HTTPError, URLError
+from html.parser import HTMLParser
+
+# Debugging
+import logging
+log = logging.getLogger(__name__)
+
+# Get links from a given URL
+def _get_links(url):
+    class LinkParser(HTMLParser):
+        def handle_starttag(self, tag, attrs):
+            if tag == 'a':
+                attrs = dict(attrs)
+                links.add(attrs.get('href').rstrip('/'))
+    links = set()
