@@ -96,3 +96,18 @@ def _get_links(url):
                 attrs = dict(attrs)
                 links.add(attrs.get('href').rstrip('/'))
     links = set()
+    try:
+        log.debug('Getting links from %s' % url)
+        u = urlopen(url)
+        parser = LinkParser()
+        parser.feed(u.read().decode('utf-8'))
+    except Exception as e:
+        log.debug('Could not get links. %s', e)
+    log.debug('links: %r', links)
+    return links
+
+class UrlMetaFinder(importlib.abc.MetaPathFinder):
+    def __init__(self, baseurl):
+        self._baseurl = baseurl
+        self._links = {}
+        self._loaders = { baseurl : UrlModuleLoader(baseurl) }
