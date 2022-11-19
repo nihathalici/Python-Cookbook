@@ -111,3 +111,48 @@ class UrlMetaFinder(importlib.abc.MetaPathFinder):
         self._baseurl = baseurl
         self._links = {}
         self._loaders = { baseurl : UrlModuleLoader(baseurl) }
+    
+    def find_module(self, fullname, path=None):
+        log.debug('find_module: fullname=%r, path=%r', fullname, path)
+        if path is None:
+            baseurl = self._baseurl
+        else:
+            if not path[0].startswith(self._baseurl):
+                return None
+            baseurl = path[0]
+        
+        parts = fullname.split('.')
+        basename = parts[-1]
+        log.debug('find_module: baseurl=%r, basename=%r', baseurl, basename)
+
+        # Check link cache
+        if basename in self._links[baseurl]:
+            log.debug('find_module: trying package %r', fullname)
+            fullurl = self._baseurl + '/' + basename
+            # Attempt to load the package (which accesses __init__.py)
+            loader = UrlPackageLoader(fullurl)
+            try:
+                loader.load_module(fullname)
+                self._links[fullurl] = _get_links(fullurl)
+                self._loaders[fullurl] = UrlModuleLoader(fullurl)
+                log.debug('find_module: package %r loaded', fullname)
+            except ImportError as e:
+                log.debug('find_module: package failed. %s', e)
+                loader = None
+            return loader
+        
+        # A normal module
+        filename = basename + '.py'
+        if filename in self._links[baseurl]:
+            log.debug('find_module: module %r found', fullname)
+            return self._loaders[baseurl]
+        else:
+            log.debug('find_module: module %r not found', fullname)
+            return None
+
+    def invalidate_caches(self):
+        log.debug('invalidating link cache')
+        self._links.clear()
+
+
+
