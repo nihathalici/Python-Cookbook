@@ -204,25 +204,53 @@ class UrlModuleLoader(importlib.abc.SourceLoader):
     def is_package(self, fullname):
         return False
 
+# Package loader for a URL
+class UrlPackageLoader(UrlModuleLoader):
+    def load_module(self, fullname):
+        mod = super().load_module(fullname)
+        mod.__path__ = [ self._baseurl ]
+        mod.__package__ = fullname
+    
+    def get_filename(self, fullname):
+        return self._baseurl + '/' + '__init__.py'
+    
+    def is_package(self, fullname):
+        return True
+
+# Utility functions for installing/uninstalling the loader
+_installed_meta_cache = {}
+def install_meta(address):
+    if address not in _installed_meta_cache:
+        finder = UrlMetaFinder(address)
+        _installed_meta_cache[address] = finder
+        sys.meta_path.append(finder)
+        log.debug('%r installed on sys.meta_path', finder)
+
+def remove_data(address):
+    if address in _installed_meta_cache:
+        finder = _installed_meta_cache.pop(address)
+        sys.meta_path.remove(finder)
+        log.debug('%r removed from sys.meta_path', finder)
+
 ###
 
-def add(self, value):
-    self.raw_counter[value] += 1
-    self.mean = self.compute_mean()
-    self.stddev = self.compute_stddev()
+# import fib # ImportError: No module named 'fib'
 
-def __init__(self, counter:Counter=None):
-    if counter:
-        self.raw_counter = counter
-        self.count = sum(self.raw_counter[k] for k in self.raw_counter)
-        self.sum = sum(self.raw_counter[k]*k for k in self.raw_counter)
-        self.sum2 = sum(self.raw_counter[k]*k**2 for k in self.raw_counter)
-        self.mean = self.sum/self.count
-        self.stddev = math.sqrt((self.sum2 - self.sum**2/self.count) / (self.count - 1))
-    else:
-        self.raw_counter = Counter()
-        self.count = 0
-        self.sum = 0
-        self.sum2 = 0
-        self.mean = None
-        self.stddev = None
+# Load the importer and retry (it works)
+import urlimport
+urlimport.install_meta('http://localhost:15000')
+import fib
+import spam
+import grok.blah
+
+
+
+
+
+
+
+    
+    
+
+
+
