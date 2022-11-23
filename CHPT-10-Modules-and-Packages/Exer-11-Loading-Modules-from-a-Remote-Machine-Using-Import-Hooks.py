@@ -243,6 +243,52 @@ import fib
 import spam
 import grok.blah
 
+grok.blah.__file__
+
+# urlimport.py
+
+# Path finder class for a URL
+class UrlPathFinder(importlib.abc.PathEntryFinder):
+    def  __init__(self, baseurl):
+        self._links = None
+        self._loader = UrlModuleLoader(baseurl)
+        self._baseurl = baseurl
+    
+        def find_loader(self, fullname):
+            log.debug('find_loader: %r', fullname)
+            parts = fullname.split('.')
+            basename = parts[-1]
+            # Check link cache
+            if self._links is None:
+                self._links = []
+                self._links = _get_links(self._baseurl)
+            
+            # Check if it's a package
+            if basename in self._links:
+                log.debug('find_loader: trying package %r', fullname)
+                fullurl = self._baseurl + '/' + basename
+                # Attempt to load the package (which accesses __init__.py)
+                loader = UrlPackageLoader(fullurl)
+                try:
+                    loader.load_module(fullname)
+                    log.debug('find loader: package %r loaded', fullname)
+                except ImportError as e:
+                    log.debug('find_loader: %r is a namespace package', fullname)
+                    loader = None
+                return (loader, [fullurl])
+
+# A normal module
+filename = basename + '.py'
+if filename in self._links:
+    log.debug('find_loader: module %r found', fullname)
+    return (self._loader, [])
+else:
+    log.debug('find_loader: module %r not found', fullname)
+    return (None, [])
+
+
+def invalidate_caches(self):
+    pass
 
 
 
