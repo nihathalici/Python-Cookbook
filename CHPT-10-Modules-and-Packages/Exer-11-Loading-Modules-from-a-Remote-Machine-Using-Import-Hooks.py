@@ -288,15 +288,64 @@ else:
 
 
 def invalidate_caches(self):
-    pass
+    log.debug('invalidating link cache')
+    self._links = None
 
+# Check path to see if it looks like a URL
+_url_path_cache = {}
+def handle_url(path):
+    if path.startswith(('http://', 'https://')):
+        log.debug('Handle path? %s. [Yes]', path)
+        if path in _url_path_cache:
+            finder = _url_path_cache[path]
+        else
+            finder = UrlPathFinder(path)
+            _url_path_cache[path] = finder
+        return finder 
+    else:
+        log.debug('Handle path? %s. [No]', path)
 
+def install_path_hook():
+    sys.path_hooks.append(handle_url)
+    sys.path_importer_cache.clear()
+    log.debug('Installing handle_url')
 
+def remove_path_hook():
+    sys.path_hooks.remove(handle_url)
+    sys.path_importer_cache.clear()
+    log.debug('Removing handle_url')
 
+###
 
-
+# import fib ImportError: No module named 'fib'
     
-    
+# Install the path hook
+import urlimport
+urlimport.install_path_hook()
+
+# Imports still fail (not on path)
+# import fib ImportError: No module named 'fib'
+
+# Add an entry to sys.path and watch it work
+import sys
+sys.path.append('http://localhost:15000')
+import fib 
+import grok.blah
+grok.blah.__file__
+
+###
+
+fib 
+fib.__name__
+fib.__file__
+import inspect
+print(inspect.getsource(fib))
+
+def fib(n):
+    if n < 2:
+        return 1
+    else:
+        return fib(n - 1) + fib(n - 2)
 
 
 
