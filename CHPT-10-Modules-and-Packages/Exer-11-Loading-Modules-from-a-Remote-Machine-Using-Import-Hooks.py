@@ -347,5 +347,68 @@ def fib(n):
     else:
         return fib(n - 1) + fib(n - 2)
 
+###
+    
+import imp
 
+m = imp.new_module('spam')
+m
+m.__name__
 
+###
+
+import sys
+import imp
+
+m = sys.modules.setdefault('spam', imp.new_module('spam'))
+m 
+
+###
+
+import math
+m = sys.modules.setdefault('math', imp.new_module('math'))
+m
+m.sin(2)
+m.cos(2)
+
+###
+
+from pprint import pprint
+pprint(sys.meta_path)
+
+###
+
+class Finder:
+    def find_module(self, fullname, path):
+        print('Looking for', fullname, path)
+        return None
+
+import sys
+sys.meta_path.insert(0, Finder())  # Insert as first entry
+import math
+import types
+import threading
+import xml.etree.ElementTree
+
+del sys.meta_path[0]
+sys.meta_path.append(Finder())
+import urllib.request
+import datetime
+import fib # ImportError
+import xml.superfast # ImportError
+
+###
+
+from pprint import pprint
+import sys
+pprint(sys.path_importer_cache)
+
+class Finder:
+    def find_loader(self, name):
+        print('Looking for', name)
+        return (None, [])
+
+import sys
+sys.path_importer_cache['debug'] = Finder()
+sys.path.insert(0, 'debug')
+import threading
