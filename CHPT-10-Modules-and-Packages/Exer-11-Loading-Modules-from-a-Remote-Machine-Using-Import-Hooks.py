@@ -412,3 +412,28 @@ import sys
 sys.path_importer_cache['debug'] = Finder()
 sys.path.insert(0, 'debug')
 import threading
+
+sys.path_importer_cache.clear()
+def check_path(path):
+    print('Checking', path)
+    raise ImportError()
+
+sys.path_hooks.insert(0, check_path)
+# import fib # ImportError: No module named 'fib' 
+
+def check_url(path):
+    if path.startswith('http://'):
+        return Finder()
+    else:
+        raise ImportError()
+
+sys.path.append('http://localhost:15000')
+sys.path_hooks[0] = check_url
+# import fib # ImportError: No module named 'fib'
+sys.path_importer_cache['http://localhost:15000']
+
+###
+
+import xml.etree.ElementTree
+xml.__path__
+xml.etree.__path__
