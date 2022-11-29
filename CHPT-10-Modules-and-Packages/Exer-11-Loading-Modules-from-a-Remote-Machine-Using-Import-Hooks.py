@@ -437,3 +437,21 @@ sys.path_importer_cache['http://localhost:15000']
 import xml.etree.ElementTree
 xml.__path__
 xml.etree.__path__
+
+###
+
+# Check link cache
+if self._links is None:
+    self._links = []
+    self._links = _get_links(self._baseurl)
+
+###
+
+import logging 
+logging.basicConfig(level=logging.DEBUG)
+import urlimport
+urlimport.install_path_hook()
+# import fib # ImportError: No module named 'fib'
+import sys
+sys.path.append('http://localhost:15000')
+import fib
