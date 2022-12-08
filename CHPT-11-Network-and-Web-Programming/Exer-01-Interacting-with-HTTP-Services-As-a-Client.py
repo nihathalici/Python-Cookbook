@@ -1,4 +1,4 @@
-# Exer-01-Interacting-with-HTTP-Services-As-a-Client
+]# Exer-01-Interacting-with-HTTP-Services-As-a-Client
 
 from urllib import request, parse
 
@@ -78,3 +78,47 @@ resp = requests.post(url, data=parms, headers=headers)
 
 # Decoded text returned by the request
 text = resp.text
+
+###
+
+import requests
+
+resp = requests.head('http://www.python.org/index.html')
+
+status = resp.status_code
+last_modified = resp.headers['last-modified']
+content_type = resp.headers['content-type']
+content_length = resp.headers['content-length']
+
+import requests
+
+resp = requests.get('http://pypi.python.org/pypi?:action=login',
+                    auth=('user', 'password'))
+
+###
+
+# First request
+resp1 = requests.get(url)
+
+# Second requests with cookies received on first requests
+resp2 = requests.get(url, cookies=resp1.cookies)
+
+###
+
+url = 'http://httpbin.org/post'
+files = { 'file': ('data.csv', open('data.csv', 'rb')) }
+
+r = requests.post(url, files=files)
+
+###
+
+from http.client import HTTPConnection
+from urllib import parse
+
+c = HTTPConnection('www.python.org', 80)
+c.request('HEAD', '/index.html')
+resp = c.getresponse()
+
+print('Status', resp.status)
+for name, value in resp.getheaders():
+    print(name, value)
