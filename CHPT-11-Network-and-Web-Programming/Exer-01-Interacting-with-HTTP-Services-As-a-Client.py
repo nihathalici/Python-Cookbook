@@ -122,3 +122,26 @@ resp = c.getresponse()
 print('Status', resp.status)
 for name, value in resp.getheaders():
     print(name, value)
+
+###
+
+import urllib.request
+
+auth = urllib.request.HTTPBasicAuthHandler()
+auth.add_password('pypi','http://pypi.python.org','username','password')
+opener = urllib.request.build_opener(auth)
+
+r = urllib.request.Request('http://pypi.python.org/pypi?:action=login')
+u = opener.open(r)
+resp = u.read()
+
+###
+
+import requests
+import json
+
+r = requests.get('http://httpbin.org/get?name=Dave&n=37',
+    headers = { 'User-agent': 'goaway/1.0' })
+resp = r.json
+print(resp['headers'])
+print(resp['args'])
