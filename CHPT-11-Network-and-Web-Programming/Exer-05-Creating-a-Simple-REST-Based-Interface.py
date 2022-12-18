@@ -84,6 +84,51 @@ print(u.read().decode('utf-8'))
 u = urlopen('http://localhost:8080/localtime')
 print(u.read().decode('utf-8'))
 
+###
 
+import cgi
 
+def wsgi_app(environ, start_response):
+  method = environ['REQUEST_METHOD']
+  path = environ['PATH_INFO']
+  # Parse the query parameters
+  params = cgi.FieldStorage(environ['wsgi.input'], environ=environ)
+  ...
 
+###
+
+def wsgi_app(environ, start_response):
+  ...
+  start_response('200 OK', [ ('Content-type', 'text/plain') ])
+  resp = []
+  resp.append(b'Hello World\n')
+  resp.append(b'Goodbye!\n')
+  return resp
+
+###
+
+def wsgi_app(environ, start_response):
+  ...
+  start_response('200 OK', [ ('Content-type', 'text/plain') ])
+  yield b'Hello World\n'
+  yield b'Goodbye!\n'
+
+###
+
+class WSGIApplication:
+  def __init__(self):
+    ...
+  def __call__(self, environ, start_response):
+    ...
+
+if __name__ == '__main__':
+  from wsgiref.simple_server import make_server
+
+  # Create the dispatcher and register functions
+  dispatcher = PathDispatcher()
+  ...
+
+  # Launch a basic server
+  httpd = make_server('', 8080, dispatcher)
+  print('Serving on port 8080...')
+  httpd.serve_forever()
