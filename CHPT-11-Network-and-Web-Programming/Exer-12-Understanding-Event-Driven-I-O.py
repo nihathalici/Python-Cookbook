@@ -190,3 +190,37 @@ class ThreadPoolHandler(EventHandler):
             callback(result)
             self.done_sock.recv(1)
         self.pending = []
+
+
+###
+
+
+def fib(n):
+    if n < 2:
+        return 1
+    else:
+        return fib(n - 1) + fib(n - 2)
+
+
+class UDPFFibServer(UDPServer):
+    def handle_receive(self):
+        msg, addr = self.sock.recvfrom(128)
+        n = int(msg)
+        pool.run(fib, (n,), callback=lambda r: self.respond(r, addr))
+
+    def respond(self, result, addr):
+        self.sock.sendto(str(result).encode("ascii"), addr)
+
+
+if __name__ == "__main__":
+    pool = ThreadPoolHandler(16)
+    handlers = [pool, UDPFFibServer(("", 16000))]
+    event_loop(handlers)
+
+from socket import *
+
+sock = socket(AF_INET, SOCK_DGRAM)
+for x in range(40):
+    sock.sento(str(x).encode("ascii"), ("localhost", 16000))
+    resp = sock.recvfrom(8192)
+    print(resp[0])
