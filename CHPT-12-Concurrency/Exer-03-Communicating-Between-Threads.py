@@ -146,3 +146,73 @@ def consumer(in_q):
         ...
         # Indicate completion
         evt.set()
+
+
+###
+
+from queue import Queue
+from threading import Thread
+import copy
+
+# A thread that produces data
+def producer(out_q):
+    while True:
+        # Produce some data
+        ...
+        out_q.put(copy.deepcopy(data))
+
+
+# A thread that consumes data
+def consumer(in_q):
+    while True:
+        # Get some data
+        data = in_q.get()
+        # Process the data
+        ...
+
+
+###
+
+import queue
+
+q = queue.Queue()
+
+try:
+    data = q.get(block=False)
+except queue.Empty:
+    ...
+
+try:
+    q.put(item, block=False)
+except queue.Full:
+    ...
+
+try:
+    data = q.get(timeout=5.0)
+except queue.Empty:
+    ...
+
+###
+
+
+def producer(q):
+    ...
+    try:
+        q.put(item, block=False)
+    except queue.Full:
+        log.warning("queued item %r discarded!", item)
+
+
+###
+
+_running = True
+
+
+def consumer(q):
+    while _running:
+        try:
+            item = q.get(timeout=5.0)
+            # Process item
+            ...
+        except queue.Empty:
+            pass
