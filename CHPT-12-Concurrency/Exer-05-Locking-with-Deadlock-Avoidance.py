@@ -1,5 +1,4 @@
 # Exer-05-Locking-with-Deadlock-Avoidance
-
 import threading
 from contextlib import contextmanager
 
@@ -30,3 +29,26 @@ def acquire(*locks):
         for lock in reversed(locks):
             lock.release()
         del acquired[-len(locks) :]
+
+
+###
+
+import threading
+
+# The philosopher thread
+def philosopher(left, right):
+    while True:
+        with acquire(left, right):
+            print(threading.currentThread(), "eating")
+
+
+# The chopsticks (represented by locks)
+NSTICKS = 5
+chopsticks = [threading.Lock() for n in range(NSTICKS)]
+
+# Create all of the philosophers
+for n in range(NSTICKS):
+    t = threading.Thread(
+        target=philosopher, args=(chopsticks[n], chopsticks[(n + 1) % NSTICKS])
+    )
+    t.start()
