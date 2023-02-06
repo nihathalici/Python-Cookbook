@@ -117,3 +117,42 @@ sched.new_actor("counter", counter(sched))
 # Send an initial message to the counter to initiate
 sched.send("counter", 10000)
 sched.run()
+
+###
+
+from collections import deque
+from select import select
+
+# This class represents a generic yield event in the scheduler
+class YieldEvent:
+    def handle_yield(self, sched, task):
+        pass
+
+    def handle_resume(self, sched, task):
+        pass
+
+
+# Task Scheduler
+class Scheduler:
+    def __init__(self):
+        self._numtasks = 0
+        self._ready = deque()
+        self._read_waiting = {}
+        self._write_waiting = {}
+
+    # Poll for I/O events and restart waiting tasks
+    def _iopoll(self):
+        rset, wset, eset = select(self._read_waiting, self._write_waiting, [])
+        for r in rset:
+            evt, task = self._read_waiting.pop(r)
+            evt.handle_resume(self, task)
+        for w in wset:
+            evt, task = self._write_waiting.pop(w)
+            evt.handle_resume(self, task)
+
+    def new(self, task):
+        """
+        Add a newly started task to the scheduler
+        """
+        self._ready.append((task, None))
+        self._numtasks += 1
