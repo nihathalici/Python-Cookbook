@@ -156,3 +156,67 @@ class Scheduler:
         """
         self._ready.append((task, None))
         self._numtasks += 1
+
+    def add_ready(self, task, msg=None):
+        """
+        Append an already started task to the ready queue.
+        msg is what to send into the task when it resumes.
+        """
+        self._ready.append((task, msg))
+
+    # Add a task to the reading set
+    def _read_wait(self, fileno, evt, task):
+        self._read_waiting[fileno] = (evt, task)
+
+    # Add a task to the write set
+    def _write_wait(self, fileno, evt, task):
+        self._write_waiting[fileno] = (evt, task)
+
+    def run(self):
+        """
+        Run the task scheduler until there are no tasks
+        """
+        while self._numtasks:
+            if not self._ready:
+                self._iopoll()
+            task, msg = self._ready.popleft()
+            try:
+                # Run the coroutine to the next yield
+                r = task.send(msg)
+                if isinstance(r, YieldEvent):
+                    r.handle_yield(self, task)
+                else:
+                    raise RuntimeError("unrecognized yield event")
+            except StopIteration:
+                self._numtasks -= 1
+
+
+# Example implementation of coroutine-based socket I/O
+class ReadSocket(YieldEvent):
+    def __init__(self, sock, nbytes):
+        self.sock = sock
+        self.nbytes = nbytes
+
+    def handle_yield(self, sched, task):
+        sched._read_wait(self.sock.fileno(), self, task)
+
+    def handle_resume(self, sched, task):
+        data = self.sock.recv(self.nbytes)
+        sched.add_ready(task, data)
+
+
+class WriteSocket(YieldEvent):
+    def __init__(self, sock, data):
+        self.sock = sock
+        self.data = data
+
+    def handle_yield(self, sched, task):
+        sched._write_wait(self.sock.fileno(), self, task)
+
+    def handle_resume(self, sched, task):
+        nsent = self.sock.send(self.data)
+        sched.add_ready(task, nsent)
+
+
+class AcceptSocket(YieldEvent):
+    pass
