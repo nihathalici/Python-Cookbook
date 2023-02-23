@@ -267,4 +267,32 @@ if __name__ == "__main__":
 
     # Echo server using generators
     class EchoServer:
-        pass
+        def __init__(self, addr, sched):
+            self.sched = sched
+            sched.new(self.server_loop(addr))
+
+        def server_loop(self, addr):
+            s = Socket(socket(AF_INET, SOCK_STREAM))
+            s.bind(addr)
+            s.listen(5)
+            while True:
+                c, a = yield s.accept()
+                print("Got connection from ", a)
+                self.sched.new(self.client_handler(Socket(c)))
+
+        def client_handler(self, client):
+            while True:
+                line = yield from readline(client)
+                if not line:
+                    break
+                line = b"GOT:" + line
+                while line:
+                    nsent = yield client.send(line)
+                    line = line[nsent:]
+            client.close()
+            print("Client closed")
+
+
+sched = Scheduler()
+EchoServer(("", 16000), sched)
+sched.run()
