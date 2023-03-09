@@ -91,3 +91,12 @@ if __name__ == "__main__":
     else:
         print("Unknown command {!r}".format(sys.argv[1]), file=sys.stderr)
         raise SystemExit(1)
+
+###
+
+daemonize(
+    "daemon.pid", stdin="/dev/null", stdout="/tmp/daemon.log", stderr="/tmp/daemon.log"
+)
+
+# Illegal. Must use keyword arguments
+daemonize("daemon.pid", "/dev/null", "/tmp/daemon.log", "/tmp/daemon.log")
