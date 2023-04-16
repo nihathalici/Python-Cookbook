@@ -145,3 +145,83 @@ sample.avg([1, 2, 3])
 p1 = sample.Point(1,2)
 p2 = sample.Point(4,5)
 sample.distance(p1,p2)
+
+###
+
+from ctypes.util import find_library
+find_library('m')
+find_library('pthread')
+find_library('sample')
+
+_mod = ctypes.cdll.LoadLibrary(_path)
+
+# int in_mandel(double, double, int)
+in_mandel = _mod.in_mandel
+in_mandel.argtypes = (ctypes.c_double, ctypes.c_double, ctypes.c_int)
+in_mandel.restype = ctypes.c_int
+
+###
+
+divide = _mod.divide
+divide.argtypes = (ctypes.c_int, ctypes.c_int, ctypes.POINTER(ctypes.c_int))
+x = 0
+divide(10, 3, x)  # ctypes.ArgumentError
+
+###
+
+x = ctypes.c_int()
+divide(10, 3, x)
+x.value
+
+###
+
+# int divide(int, int, int *)
+divide = _mod.divide
+divide.argtypes = (ctypes.c_int, ctypes.c_int, ctypes.POINTER(ctypes.c_int))
+_divide.restype = ctypes.c_int
+
+def divide(x, y):
+    rem = ctypes.c_int()
+    quot = _divide(x, y, rem)
+    return quot, rem.value
+
+###
+
+nums = [1, 2, 3]
+a = (ctypes.c_double * len(nums))(*nums)
+a[0]  # 1.0
+
+###
+
+import array
+a = array.array('d', [1, 2, 3])
+ptr_ = a.buffer_info()
+ptr  # 4298687200
+c.types.cast(ptr, ctypes.POINTER(ctypes.c_double))  # <__main__.LP_c_double object at 0x10069cd40>
+
+###
+
+import sample
+
+sample.avg([1, 2, 3])
+
+import array
+
+sample.avg(array.array('d', [1, 2, 3]))
+import numpy
+
+sample.avg(numpy.array([1.0,2.0,3.0]))
+
+###
+
+class Point(ctypes.Structure):
+    _fields_ = [('x', ctypes.c_double),
+                ('y', ctypes.c_double)]
+
+###
+
+p1 = sample.Point(1, 2)
+p2 = sample.Point(4, 5)
+p1.x  # 1.0
+p1.y  # 2.0
+sample.distance(p1, p2)
