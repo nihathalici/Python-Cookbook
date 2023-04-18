@@ -107,3 +107,17 @@ import sample
 sample.gcd(35, 42)
 sample.in_mandel(0, 0, 500)
 sample.in_mandel(2.0, 1.0, 500)
+sample.divide(42, 8)
+
+###
+
+static PyObject *py_func(PyObject *self, PyObject *args) {
+    ...
+}
+
+###
+
+return Py_BuildValue("i", 34);  // Return an integer
+return Py_BuildValue("d", 3.4);  // Return a double
+return Py_BuildValue("s", "Hello");  // Null-terminated UTF-8 string 
+return Py_BuildValue("(ii)", 3, 4);  // Tuple (3, 4)
