@@ -56,3 +56,19 @@ avg(a[:,2])  # ValueError
 sample.avg(a)  # TypeError
 
 sample.avg(a[0])  # 2.0
+
+###
+
+typedef struct bufferinfo {
+    void *buf;                  /* Pointer to buffer memory */
+    PyObject *obj;              /* Python object that is the owner */
+    Py_ssize_t len;             /* Total size in bytes */
+    Py_ssize_t itemsize;        /* Size in bytes of a single item */
+    int readonly;               /* Read-only access flag */
+    int ndim;                   /* Number of dimensions */
+    char *format;               /* struct code of a single item */
+    Py_ssize_t *shape;          /* Array containing dimensions */
+    Py_ssize_t *strides;        /* Array containing strides */
+    Py_ssize_t *suboffsets;     /* Array containing suboffsets */
+
+} Py_buffer;
