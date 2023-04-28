@@ -55,3 +55,69 @@ fail:
    
 }
 
+###
+
+#include <Python.h>
+
+/* Definition of call_func() same as above */
+...
+
+/* Load a symbol from a module */
+PyObject *import_name(const char *modname, const char *symbol) {
+   PyObject *u_name, *module;
+   u_name = PyUnicode_FromString(modname);
+   module = PyImport_Import(u_name);
+   Py_DECREF(u_name);
+   return PyObject_GetAttrString(module, symbol);
+}
+
+/* Simple embedding example */
+int main() {
+   PyObject *pow_func;
+   double x;
+
+   Py_Initialize();
+   /* Get a reference to the math.pow function */
+   pow_func = import_name("math", "pow");
+   
+   /* Call it using our call_func() code */
+   for (x = 0.0; x < 10.0; x += 0.1) {
+      printf("%0.2f %0.2f\n", x, call_func(pow_func, x, 2.0));
+   }
+   /* Done */
+   PyDECREF(pow_func);
+   Py_Finalize();
+   return 0;
+}
+
+###
+# Makefile
+
+all::
+  cc -g embed.c -I/usr/local/include/python3.3m \
+  -L/usr/local/lib/python3.3/config-3.3m -lpython3.3m
+
+###
+
+/* Extension function for testing the C-Python callback */
+PyObject *py_call_func(PyObject *self, PyObject *args) {
+   PyObject *func;
+
+   double x, y, result;
+   if (!PyArg_ParseTuple(args, "Odd", &func, &x, &y)) {
+      return NULL;
+   }
+   result = call_func(func, x, y);
+   return PyBuildValue("d", result); 
+}
+
+###
+
+import sample
+
+def add(x, y):
+  return x + y 
+
+sample.call_func(add, 3, 4)
+
+
