@@ -120,4 +120,65 @@ def add(x, y):
 
 sample.call_func(add, 3, 4)
 
+###
 
+double call_func(PyObject *func, double x, double y) {
+   ...
+   /* Verify that func is a proper callable */
+   if (!PyCallable_Check(func)) {
+      fprintf(stderror, "call_func: expected a callable\n");
+      goto fail;
+   }
+   ...
+
+}
+
+###
+
+double call_func(PyObject *func, double x, double y) {
+   PyObject *args;
+   PyObject *kwargs;
+   
+   ...
+   /* Build arguments */
+   args = Py_BuildValue('(dd)', x, y);
+   kwargs = NULL;
+
+   /* Call the function */
+   result = PyObject_Call(func, args, kwargs);
+   Py_DECREF(args);
+   Py_XDECREF(kwargs);
+   ...
+}
+
+###
+
+  /* Check for Python exceptions (if any) */
+  if (PyErr_Occurred()) {
+     PyErr_Print();
+     goto fail;
+  }
+  ...
+fail:
+  PyGILState_Release(state);
+  abort();
+
+###
+
+double call_func(PyObject *func, double x, double y) {
+   ...
+   double retval;
+
+   /* Make sure we own the GIL */
+   PyGILState_STATE state = PyGILState_Ensure();
+   ...
+   /* Code that uses Python C API functions */
+   ...
+   /* Restore previous GIL state and return */
+   PyGILState_Release(state);
+   return retval;
+
+fail:
+    PyGILState_Release(state);
+    abort();
+}
