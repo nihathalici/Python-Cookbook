@@ -110,3 +110,39 @@ import array
 
 a = array.array('d', [1, 2, 3])
 sample.avg(a) # 2.0
+
+###
+
+%module sample
+%{
+#include "sample.h"    
+%}
+
+###
+
+%module sample
+%{
+#include "sample.h"    
+%}
+...
+extern int gcd(int, int);
+extern int in_mandel(double x0, double y0, int n);
+extern int divide(int a, int b, int *remainder);
+extern double avg(double *a, int n);
+
+typedef struct Point {
+    double x, y;
+} Point;
+
+extern double distance(Point *p1, Point *p2)
+
+###
+
+p1 = sample.Point(2, 3)
+
+###
+
+# Usage if %extend Point is omitted
+p1 = sample.Point()
+p1.x = 2.0
+p1.y = 3
