@@ -107,3 +107,87 @@ p1 = sample.Point(2,3)
 p2 = sample.Point(4,5)
 p1  # <capsule object "Point" at...
 sample.distance(p1, p2)
+
+###
+
+cimport sample
+
+def gcd(unsigned int x, unsigned int y):
+    return csample.gcd(x, y)
+
+sample.gcd(-10, 2)  # OverflowError
+
+###
+
+def gcd(unsigned int x, unsigned int y):
+    if x <= 0:
+        raise ValueError("x must be > 0")
+    if y <= 0:
+        raise ValueError("y must be > 0")
+    return csample.gcd(x, y)
+
+def divide(x, y):
+    cdef int rem  
+    quot = csample.divide(x, y, &rem)
+    return quot, rem
+
+###
+
+import array
+a = array.array('d', [1, 2, 3])
+
+import numpy
+b = numpy.array([1., 2., 3.])
+
+import sample 
+sample.avg(a)  # 2.0
+sample.avg(b)  # 2.0
+
+###
+
+from cpython.pycapsule cimport *
+from libc.stdlib cimport malloc, free 
+
+###
+
+# sample.pyx
+
+cimport csample 
+from libc.stdlib cimport malloc, free
+...
+
+cdef class Point:
+    cdef csample.Point *_c_point
+    def __cinit__(self, double x, double y):
+        self._c_point = <csample.Point *> malloc(sizeof(csample.Point))
+        self._c_point.x = x
+        self._c_point.y = y 
+    
+    def __dealloc__(self):
+        free(self._c_point)
+    
+    property x:
+        def __get__(self):
+            return self._c_point.x
+        def __set__(self, value):
+            self._c_point.x = value
+
+    property y:
+        def __get__(self):
+            return self._c_point.y
+        def __set__(self, value):
+            self._c_point.y = value
+
+    def distance(Point p1, Point p2):
+        return csample.distance(p1._c_point, p2._c_point)
+  
+###
+
+import sample 
+
+p1 = sample.Point(2, 3)
+p2 = sample.Point(4, 5)
+p1  # <sample.Point object at ...
+p1.x  # 2.0
+p1.y  # 3.0
+sample.distance(p1, p2)  # 2.8284271247461903
