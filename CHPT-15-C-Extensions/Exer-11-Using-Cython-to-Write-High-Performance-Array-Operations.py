@@ -70,3 +70,66 @@ max(c)  # 5.0
 timeit('numpy.clip(b,-5,5,c)', 'from __main__ import b, c, numpy', number = 1000)
 
 timeit('sample.clip(b,-5,5,c)', 'from __main__ import b, c, sample', number = 1000)
+
+###
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cpdef clip(double[:] a, double min, double max, double[:] out):
+
+    if min > max:
+        raise ValueError("min must be <= max")
+    if a.shape[0] != out.shape[0]:
+        raise ValueError("input and output arrays must be the same size")
+    for i in range(a.shape[0]):
+        out[i] = (a[i] if a[i] < max else max) if a[i] > min else min 
+
+###
+
+void clip(double *a, int n, double min, double max, double *out) {
+    double x;
+    for (; n >= 0; n--, a++, out++) {
+        x = *a;
+        *out = x > max ? max : ( x < min ? min : x );
+    }
+}
+
+###
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cpdef clip(double[:] a, double min, double max, double[:] out):
+    if min > max:
+        raise ValueError("min must be <= max")
+    if a.shape[0] != out.shape[0]:
+        raise ValueError("input and output arrays must be the same size")
+    with nogil:
+        for i in range(a.shape[0]):
+            out[i] = (a[i] if a[i] < max else max) if a[i] > min else min 
+
+###
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cpdef clip2d(double[:,:] a, double min, double max, double[:,:] out):
+    if min > max:
+        raise ValueError("min must be <= max")
+    for n in range(a.ndim):
+        if a.shape[n] != out.shape[n]:
+            raise TypeError("a and out have different shapes")
+    for i in range(a.shape[0]):
+        for j in range(a.shape[1]):
+            if a[i,j] < min:
+                out[i,j] = min
+            elif a[i,j] > max:
+                out[i,j] = max
+            else:
+                out[i,j] = a[i,j]
+
+    
+
+    if a.shape[0] != out.shape[0]:
+        raise ValueError("input and output arrays must be the same size")
+    for i in range(a.shape[0]):
+        out[i] = (a[i] if a[i] < max else max) if a[i] > min else min 
+
